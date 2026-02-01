@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Grading</title>
+    <style>
+        /* ===== Main Container ===== */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 40px auto;
+            font-family: Arial, sans-serif;
+        }
+        /* ===== Input Rows ===== */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-row label {
+            width: 150px;
+        }
+        /* ===== Input Styling ===== */
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            background-color: #eef6ff;
+            border-color: #007bff;
+        }
+        /* ===== Button Group ===== */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        /* ===== Buttons ===== */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #btn-calculate {
+            background-color: #007bff;
+        }
+        #btn-clear {
+            background-color: #6c757d;
+        }
+        /* ===== Result Box ===== */
+        #result-container {
+            display: none;
+            background-color: #f0fff0;
+            border-left: 4px solid #2e8b57;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Input Fields -->
+        <div class="input-row">
+            <label>Student Name</label>
+            <input id="student-name" type="text">
+        </div>
+        <div class="input-row">
+            <label>Subject Name</label>
+            <input id="subject-name" type="text">
+        </div>
+        <div class="input-row">
+            <label>Midterm Score</label>
+            <input id="midterm-score" type="text">
+        </div>
+        <div class="input-row">
+            <label>Final Score</label>
+            <input id="final-score" type="text">
+        </div>
+        <div class="input-row">
+            <label>Assignment Score</label>
+            <input id="assignment-score" type="text">
+        </div>
+        <!-- Buttons -->
+        <div class="button-group">
+            <button id="btn-calculate">Calculate Grade</button>
+            <button id="btn-clear">Clear</button>
+        </div>
+        <!-- Result Section -->
+        <div id="result-container">
+            <p>Total Score: <span id="total-score">0</span></p>
+            <p>Final Grade: <span id="final-grade">-</span></p>
+            <p>Status: <span id="pass-status">-</span></p>
+        </div>
+
+        <!-- (History Section) -->
+        <div id="history-container"></div>
+    </div>
+</body>
+<script>
+    // 2.1 Input Validation
+    function validateScore(score) {
+        // ไม่ให้ว่าง
+        if (score === "" || score === null || score === undefined) {
+            return false;
+        }
+        // แปลงเป็นตัวเลข
+        const num = Number(score);
+        // ต้องเป็นตัวเลข และไม่เป็น NaN
+        if (isNaN(num)) {
+            return false;
+        }
+        // ต้องอยู่ในช่วง 0 - 100
+        if (num < 0 || num > 100) {
+            return false;
+        }
+        return true;
+    }
+    // 2.2 Calculate Score
+    function calculateScore(midterm, final, assignment) {
+        const m = Number(midterm);
+        const f = Number(final);
+        const a = Number(assignment);
+        return (m * 0.2) + (f * 0.5) + (a * 0.3);
+    }
+    // 2.3 Convert score to Letter Grade
+    function getGrade(score) {
+        const s = Number(score);
+        if (s >= 80 && s <= 100) return "A";
+        if (s >= 70) return "B";
+        if (s >= 60) return "C";
+        if (s >= 50) return "D";
+        return "F";
+    }
+    // 2.4 PASS / FAIL Status
+    function getStatus(grade) {
+        if (grade === "F") {
+        return "FAIL";
+        }
+        return "PASS";
+    }
+    // 2.5 Save to LocalStorage
+    function saveToStorage(data) {
+        // ดึงข้อมูลเดิมจาก localStorage
+        let storedData = localStorage.getItem('studentData');
+        let dataArray = [];
+        if (storedData) {
+        dataArray = JSON.parse(storedData);
+        }
+        // เพิ่มข้อมูลใหม่เข้าไปใน array
+        dataArray.push(data);
+        // บันทึกกลับลง localStorage
+        localStorage.setItem('studentData', JSON.stringify(dataArray));
+    }
+    // 2.6 Load from Browser Storage
+    function loadFromStorage() {
+         const storedData = localStorage.getItem('studentData');
+         if (!storedData) {
+            return null;
+        }
+        return JSON.parse(storedData);
+    }
+    // 2.7 Main Handler - Calculate Button Click
+    function handleCalculate() {
+        const name = document.getElementById('student-name').value.trim();
+        const subject = document.getElementById('subject-name').value.trim();
+        const midterm = document.getElementById('midterm-score').value;
+        const final = document.getElementById('final-score').value;
+        const assignment = document.getElementById('assignment-score').value;
+
+        if (name === '' || subject === '') {
+            alert('Please enter student name and subject');
+            return;
+        }
+
+        if (isNaN(Number(midterm)) || isNaN(Number(final)) || isNaN(Number(assignment))) {
+            alert('Please enter valid numbers only');
+            return;
+        }
+
+        if (!validateScore(midterm) || !validateScore(final) || !validateScore(assignment)) {
+            alert('All scores must be between 0-100');
+            return;
+        }
+
+        const totalScore = calculateScore(midterm, final, assignment);
+        const grade = getGrade(totalScore);
+
+        document.getElementById('total-score').textContent = totalScore;
+        document.getElementById('final-grade').textContent = grade;
+        document.getElementById('pass-status').textContent = getStatus(grade);
+        document.getElementById('result-container').style.display = 'block';
+
+        const data = {
+            name: name,
+            subject: subject,
+            midterm: Number(midterm),
+            final: Number(final),
+            assignment: Number(assignment),
+            score: totalScore,
+            grade: grade,
+            status: getStatus(grade)
+        };
+
+        saveToStorage(data);
+    }
+    // 2.8 Clear Form Button
+    function handleClear() {
+        document.getElementById('student-name').value = '';
+        document.getElementById('subject-name').value = '';
+        document.getElementById('midterm-score').value = '';
+        document.getElementById('final-score').value = '';
+        document.getElementById('assignment-score').value = '';
+        document.getElementById('result-container').style.display = 'none';
+    }
+    // 2.9 Auto-load on Page Load
+    window.addEventListener("DOMContentLoaded", () => {
+        const data = loadFromStorage();
+
+        // อ้างอิงไปยังส่วนแสดงผลข้อมูลเดิม
+        const container = document.getElementById('history-container');
+
+        if (!data || data.length === 0) {
+            container.style.display = 'block';
+            container.innerHTML = '<p>No data.</p>';
+            return;
+        }
+
+        container.style.display = 'block';
+        container.innerHTML = data.map(item => {
+            return `<p>${item.name} - ${item.subject} : ${item.score} (${item.grade}) ${item.status}</p>`;
+        }).join('');
+    });
+    // 2.10 Event Listener สำหรับปุ่ม Calculate และ Clear
+    document.getElementById('btn-calculate').addEventListener('click', handleCalculate);
+    document.getElementById('btn-clear').addEventListener('click', handleClear);
+</script>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <!-- Input Fields -->
+    <div class="container">
+      <label>Student Name</label>
+      <input id="student-name" type="text" /> <br />
+      <label>Subject</label>
+      <input id="subject-name" type="text" /> <br />
+      <label>Midterm score</label>
+      <input id="midterm-score" type="text" /> <br />
+      <label>Final score</label>
+      <input id="final-score" type="text" /> <br />
+      <label>Assignment score</label>
+      <input id="assignment-score" type="text" />
+    </div>
+    <!-- Buttons -->
+    <div class="btn">
+      <button id="btn-calculate">Calculate Grade</button>
+      <button id="btn-clear" type="reset">Clear</button>
+    </div>
+    <!-- Result Section (hidden by default) -->
+    <div id="result-container" style="display: none">
+      <p>Total Score: <span id="total-score">0</span></p>
+      <p>Final Grade: <span id="final-grade">-</span></p>
+      <p>Status: <span id="pass-status">-</span></p>
+    </div>
+  </body>
+  <script>
+    function validateScore(score) {
+      if (score === "" || score === null || score === undefined) {
+        return false;
+      }
+      const num = Number(score);
+
+      if (isNaN(num)) {
+        return false;
+      }
+      if (num < 0 || num > 100) {
+        return false;
+      }
+      return true;
+    }
+    function calculateScore(midterm, final, assignment) {
+      const m = Number(midterm);
+      const f = Number(final);
+      const a = Number(assignment);
+      return m * 0.2 + f * 0.5 + a * 0.3;
+    }
+    function getGrade(score) {
+      const s = Number(score);
+      if (s >= 80 && s <= 100) return "A";
+      if (s >= 70) return "B";
+      if (s >= 60) return "C";
+      if (s >= 50) return "D";
+      if (s >= 0) return "F";
+    }
+    function getStatus(grade) {
+      return grade === "F" ? "FAIL" : "PASS";
+    }
+  </script>
+</html>
