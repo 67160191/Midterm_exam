@@ -139,5 +139,14 @@
       //5.Save
       saveToStorage(data);
     }
+    function handleClear() {
+      // Clear all
+      document.getElementById("student-name").textContent = "";
+      document.getElementById("subject-name").textContent = "";
+      document.getElementById("midterm-score").textContent = "";
+      document.getElementById("final-score").textContent = "";
+      document.getElementById("assignment-score").textContent = "";
+      document.getElementById("result-container").style.display = "none";
+    }
   </script>
 </html>
