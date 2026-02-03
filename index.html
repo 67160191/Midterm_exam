@@ -88,5 +88,56 @@
       const dataArray = JSON.parse(storedData);
       return dataArray;
     }
+    function handleCalculate() {
+      //1.ดึงข้อมูลจาก input
+      const name = document.getElementById("student-name").value.trim();
+      const subject = document.getElementById("subject-name").value.trim();
+      const midterm = document.getElementById("midterm-score").value.trim();
+      const final = document.getElementById("final-score").value.trim();
+      const assignment = document
+        .getElementById("assignment-score")
+        .value.trim();
+      //2. validate word and score
+      if (name === "" || subject === "") {
+        alert("Please enter student name and subject");
+        return;
+      }
+      if (
+        isNaN(Number(midterm)) ||
+        isNaN(Number(final)) ||
+        isNaN(Number(assignment))
+      ) {
+        alert("Please enter valid numbers only");
+        return;
+      }
+      if (
+        !validateScore(midterm) ||
+        !validateScore(final) ||
+        !validateScore(assignment)
+      ) {
+        alert("All scores must be between 0-100");
+        return;
+      }
+      //3.calculate score
+      const totalScore = calculateScore(midterm, final, assignment);
+      const grade = grade(totalScore);
+      document.getElementById("total-score").textContent = totalScore;
+      document.getElementById("final-grade").textContent = grade;
+      document.getElementById("pass-status").textContent = getGrade(grade);
+      document.getElementById("result-container").style.display = "block";
+      //4. สร้าง Object
+      const data = {
+        name: name,
+        subject: subject,
+        midterm: Number(midterm),
+        final: Number(final),
+        assignment: Number(assignment),
+        score: totalScore,
+        grade: grade,
+        status: getGrade(grade),
+      };
+      //5.Save
+      saveToStorage(data);
+    }
   </script>
 </html>
