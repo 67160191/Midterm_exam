@@ -79,5 +79,14 @@
       // 4.แปลงกลับเป็น string เซฟกลับเข้าไป
       localStorage.setItem("studentData", JSON.stringify(dataArray));
     }
+    function loadFromStorage() {
+      // 1.ดึงข้อมูลเก่าออกมา
+      let storedData = localStorage.getItem("studentData");
+      // ถ้าว่างคืนค่าเป็น null
+      if (!storedData) return null;
+      // แปลงเป็น array
+      const dataArray = JSON.parse(storedData);
+      return dataArray;
+    }
   </script>
 </html>
