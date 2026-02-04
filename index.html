@@ -31,6 +31,7 @@
       <p>Final Grade: <span id="final-grade">-</span></p>
       <p>Status: <span id="pass-status">-</span></p>
     </div>
+    <div id="history-container"></div>
   </body>
   <script>
     function validateScore(score) {
@@ -148,5 +149,30 @@
       document.getElementById("assignment-score").textContent = "";
       document.getElementById("result-container").style.display = "none";
     }
+    // โหลดเมื่อ html เสร็จ
+    window.addEventListener("DOMContentLoaded", () => {
+      //ดึงข้อมูล
+      const data = loadFromStorage();
+      const container = document.getElementById("history-container");
+      // ถ้าไม่มีค่า data
+      if (!data || data.length === 0) {
+        container.style.display = "block";
+        container.innerHTML = "<p>No data.</p>";
+        return;
+      }
+      // ถ้ามีค่า data ใช้ map แล้ว join เพื่อรวมเป็น string เดียว
+      container.style.display = "block";
+      container.innerHTML = data
+        .map((item) => {
+          return `<p>${item.name} - ${item.subject} : ${item.score} (${item.grade}) ${item.status}</p>`;
+        })
+        .join("");
+    });
+
+    // listening
+    document
+      .getElementById("btn-calculate")
+      .addEventListener("click", handleCalculate);
+    document.getElementById("btn-clear").addEventListener("click", handleClear);
   </script>
 </html>
